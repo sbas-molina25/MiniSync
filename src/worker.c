@@ -19,7 +19,6 @@ void iniciarWorker(int idWorker, int pipeLeer, MemoriaCompartida *memoria, sem_t
     }
 
     while(ejecutando) {
-        // Usar select o poll para leer con timeout
         fd_set set;
         struct timeval timeout;
         FD_ZERO(&set);
@@ -34,33 +33,39 @@ void iniciarWorker(int idWorker, int pipeLeer, MemoriaCompartida *memoria, sem_t
             if (bytesLeidos > 0) {
                 printf("Worker %d procesando archivo: %s\n", idWorker, archivo.ruta);
                 
-                int exito = copiarArchivo(archivo, "backup");
-                
-                sem_wait(semaforo);
-                if (exito == 0) {
-                    memoria->archivosCopiados++;
-                    memoria->bytesCopiados += archivo.tamano;
-                    strcpy(memoria->ultimoArchivo, archivo.nombre);
+                if(archivo.permisos == 0) {
+                    // Archivo eliminado
+                    eliminarArchivoBackup(archivo, "backup");
+                } else {
+                    // Archivo nuevo o modificado
+                    int exito = copiarArchivo(archivo, "backup");
+                    sem_wait(semaforo);
+
+                    if (exito == 0) {
+                        memoria->archivosCopiados++;
+                        memoria->bytesCopiados += archivo.tamano;
+                        strcpy(memoria->ultimoArchivo, archivo.nombre);
                     
-                    if (colaLogger != -1) {
-                        char mensaje[256];
-                        snprintf(mensaje, sizeof(mensaje), 
+                        if (colaLogger != -1) {
+                            char mensaje[256];
+                            snprintf(mensaje, sizeof(mensaje), 
                                 "Worker %d: Copiado archivo %s (tamano: %ld bytes)", 
                                 idWorker, archivo.nombre, archivo.tamano);
-                        mq_send(colaLogger, mensaje, strlen(mensaje) + 1, 0);
-                    }
-                } else {
-                    memoria->errores++;
+                            mq_send(colaLogger, mensaje, strlen(mensaje) + 1, 0);
+                        }
+                    } else {
+                        memoria->errores++;
                     
-                    if (colaLogger != -1) {
-                        char mensaje[256];
-                        snprintf(mensaje, sizeof(mensaje), 
+                        if (colaLogger != -1) {
+                            char mensaje[256];
+                            snprintf(mensaje, sizeof(mensaje), 
                                 "Worker %d: Error al copiar archivo %s", 
                                 idWorker, archivo.nombre);
-                        mq_send(colaLogger, mensaje, strlen(mensaje) + 1, 0);
+                            mq_send(colaLogger, mensaje, strlen(mensaje) + 1, 0);
+                        }
                     }
+                    sem_post(semaforo);
                 }
-                sem_post(semaforo);
             }
         } else if (result == 0) {
             // Timeout - continuar

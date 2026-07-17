@@ -7,6 +7,7 @@
 
 int copiarArchivo(InfoArchivo archivo, char *dirBackup) {
     int archivoOrigen, archivoDestino;
+    crearDirectorioBackup(dirBackup);
 
     char rutaDestino[512];
     char buffer[1024];
@@ -24,14 +25,14 @@ int copiarArchivo(InfoArchivo archivo, char *dirBackup) {
     if (archivoOrigen == -1) {
         perror("Error al abrir el archivo de origen");
         // REVISAR: no vale hacer el backup cuando se elimina del test
-        return;
+        return -1;
     }
 
     archivoDestino = open(rutaDestino, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (archivoDestino == -1) {
         perror("Error al crear el archivo de destino");
         close(archivoOrigen);
-        return;
+        return -1;
     }
 
     while ((bytesLeidos = read(archivoOrigen, buffer, sizeof(buffer))) > 0) {
@@ -61,7 +62,16 @@ void eliminarArchivoBackup(InfoArchivo archivo, char *dirBackup) {
     
     if (unlink(rutaDestino) == -1) {
         perror("Error al eliminar archivo de backup");
+        return -1;
     } else {
         printf("Archivo eliminado de backup: %s\n", rutaDestino);
+    }
+}
+
+void crearDirectorioBackup(char *dirBackup) {
+    struct stat st;
+    if (stat(dirBackup, &st) == -1) {
+        mkdir(dirBackup, 0755);
+        printf("Directorio backup creado: %s\n", dirBackup);
     }
 }

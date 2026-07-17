@@ -62,14 +62,16 @@ void compararListas(ListaArchivos *listaAnterior, ListaArchivos *listaActual, in
     for (int i = 0; i < listaAnterior->cantidad; i++) {
         int indice = buscarArchivoEnLista(listaActual, listaAnterior->archivos[i]);
         if (indice == -1) {
+            InfoArchivo archivoEliminado = listaAnterior->archivos[i];
+            archivoEliminado.permisos = 0; // Indicar que el archivo ha sido eliminado
             if (siguienteWorker == 0) {
-                    write(pipe1, &listaAnterior->archivos[i], sizeof(InfoArchivo));
-                    printf("Archivo eliminado. Enviado a worker 1: %s\n", listaAnterior->archivos[i].nombre);
+                    write(pipe1, &archivoEliminado, sizeof(InfoArchivo));
+                    printf("Archivo eliminado. Enviado a worker 1: %s\n", archivoEliminado.nombre);
                     siguienteWorker = 1;
                 } else {
                     siguienteWorker = 0;
-                    write(pipe2, &listaAnterior->archivos[i], sizeof(InfoArchivo));
-                    printf("Archivo eliminado. Enviado a worker 2: %s\n", listaAnterior->archivos[i].nombre);
+                    write(pipe2, &archivoEliminado, sizeof(InfoArchivo));
+                    printf("Archivo eliminado. Enviado a worker 2: %s\n", archivoEliminado.nombre);
                 }
         }
     }
