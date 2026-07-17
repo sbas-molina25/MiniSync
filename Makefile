@@ -1,6 +1,6 @@
 # Compilador y flags
 CC = gcc
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -g -Wno-unused-parameter -Wno-unused-variable -Wno-format-truncation
 LDFLAGS = -lrt -pthread
 
 # Directorios
@@ -38,34 +38,6 @@ clean-all: clean
 run: $(TARGET)
 	./$(TARGET) test
 
-# Ejecutar en modo daemon
-rund: $(TARGET)
-	./$(TARGET) ~/minisync_test/origen &
-
-# Crear entorno de pruebas
-setup:
-	@mkdir -p test/origen
-	@mkdir -p test/backup
-	@cd test/origen && \
-		echo "Hola mundo" > archivo1.txt && \
-		dd if=/dev/zero of=archivo2.bin bs=1M count=10 2>/dev/null && \
-		echo "Archivo con permisos" > archivo3.txt && \
-		chmod 755 archivo3.txt && \
-		mkdir -p subdir1/subdir2 && \
-		echo "Archivo en subdirectorio" > subdir1/archivo4.txt && \
-		echo "Archivo profundo" > subdir1/subdir2/archivo5.txt
-	@echo "Entorno de pruebas creado en ~/minisync_test"
-
-# Ejecutar pruebas
-test: $(TARGET) setup
-	@echo "=== EJECUTANDO PRUEBAS ==="
-	@./$(TARGET) ~/minisync_test/origen &
-	@sleep 10
-	@echo "Verificando backup..."
-	@ls -la ~/minisync_test/backup/
-	@echo "=== PRUEBAS COMPLETADAS ==="
-	@pkill minisync || true
-
 # Mostrar ayuda
 help:
 	@echo "Comandos disponibles:"
@@ -73,9 +45,6 @@ help:
 	@echo "  make clean    - Eliminar archivos compilados"
 	@echo "  make clean-all - Eliminar todo (incluye archivos de prueba)"
 	@echo "  make run      - Ejecutar el programa"
-	@echo "  make rund     - Ejecutar como daemon"
-	@echo "  make setup    - Crear entorno de pruebas"
-	@echo "  make test     - Compilar, crear entorno y ejecutar pruebas"
 	@echo "  make help     - Mostrar esta ayuda"
 
 .PHONY: all clean clean-all run rund setup test help

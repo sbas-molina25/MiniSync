@@ -34,7 +34,6 @@ void procesarEntrada(char *rutaCompleta, char *nombreArchivo, ListaArchivos *lis
     }
 
     if (S_ISDIR(info.st_mode)) { // si es directorio
-        //printf("\n DIRECTORIO: %s\n", rutaCompleta);
         escanearDir(rutaCompleta, lista); // llamada recursiva para escanear el subdirectorio
     } else if (S_ISREG(info.st_mode)) { // si es solo un archivo
         InfoArchivo archivo;
@@ -66,14 +65,4 @@ void copiarListaArchivos(ListaArchivos *destino, ListaArchivos *origen) {
 
 void inicializarLista(ListaArchivos *lista){
     lista->cantidad = 0;
-}
-
-void imprimirInfoArchivo(InfoArchivo *archivo) {
-    printf("\n==========================================\n");
-    printf("Nombre del Archivo: %s\n", archivo->nombre);
-    printf("Ruta: %s\n", archivo->ruta);
-    printf("Inodo: %ld\n", archivo->inodo);
-    printf("Tamaño: %ld bytes\n", archivo->tamano);
-    printf("Permisos: %o\n", archivo->permisos);
-    printf("Fecha de Modificación: %ld\n", archivo->fechaModificacion);
 }

@@ -35,24 +35,24 @@ void compararListas(ListaArchivos *listaAnterior, ListaArchivos *listaActual, in
         if (indice == -1) {
             if (siguienteWorker == 0) {
                 write(pipe1, &listaActual->archivos[i], sizeof(InfoArchivo));
-                printf("Enviado a worker 1: %s\n", listaActual->archivos[i].nombre);
+                printf("Enviado a Worker 1: %s\n", listaActual->archivos[i].nombre);
                 siguienteWorker = 1;
             } else {
                 siguienteWorker = 0;
                 write(pipe2, &listaActual->archivos[i], sizeof(InfoArchivo));
-                printf("Enviado a worker 2: %s\n", listaActual->archivos[i].nombre);
+                printf("Enviado a Worker 2: %s\n", listaActual->archivos[i].nombre);
             }
         } else {
             if (listaActual->archivos[i].fechaModificacion != listaAnterior->archivos[indice].fechaModificacion || 
             listaActual->archivos[i].tamano != listaAnterior->archivos[indice].tamano) {
                 if (siguienteWorker == 0) {
                     write(pipe1, &listaActual->archivos[i], sizeof(InfoArchivo));
-                    printf("Enviado a worker 1: %s\n", listaActual->archivos[i].nombre);
+                    printf("Archivo nuevo/modificado. Enviado a Worker 1: %s\n", listaActual->archivos[i].nombre);
                     siguienteWorker = 1;
                 } else {
                     siguienteWorker = 0;
                     write(pipe2, &listaActual->archivos[i], sizeof(InfoArchivo));
-                    printf("Enviado a worker 2: %s\n", listaActual->archivos[i].nombre);
+                    printf("Archivo nuevo/modificado. Enviado a Worker 2: %s\n", listaActual->archivos[i].nombre);
                 }
             }
         }
@@ -66,12 +66,12 @@ void compararListas(ListaArchivos *listaAnterior, ListaArchivos *listaActual, in
             archivoEliminado.permisos = 0; // Indicar que el archivo ha sido eliminado
             if (siguienteWorker == 0) {
                     write(pipe1, &archivoEliminado, sizeof(InfoArchivo));
-                    printf("Archivo eliminado. Enviado a worker 1: %s\n", archivoEliminado.nombre);
+                    printf("Archivo eliminado. Enviado a Worker 1: %s\n", archivoEliminado.nombre);
                     siguienteWorker = 1;
                 } else {
                     siguienteWorker = 0;
                     write(pipe2, &archivoEliminado, sizeof(InfoArchivo));
-                    printf("Archivo eliminado. Enviado a worker 2: %s\n", archivoEliminado.nombre);
+                    printf("Archivo eliminado. Enviado a Worker 2: %s\n", archivoEliminado.nombre);
                 }
         }
     }

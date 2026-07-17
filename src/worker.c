@@ -76,7 +76,7 @@ void iniciarWorker(int idWorker, int pipeLeer, MemoriaCompartida *memoria, sem_t
         }
     }
     
-    printf("Worker %d: Cerrando...\n", idWorker);
+    printf("Worker %d: Cerrandose.\n", idWorker);
     
     if (colaLogger != -1) {
         mq_close(colaLogger);

@@ -5,6 +5,14 @@
 #include <string.h>
 #include <sys/stat.h>
 
+void crearDirectorioBackup(char *dirBackup) {
+    struct stat st;
+    if (stat(dirBackup, &st) == -1) {
+        mkdir(dirBackup, 0755);
+        printf("Directorio backup creado: %s\n", dirBackup);
+    }
+}
+
 int copiarArchivo(InfoArchivo archivo, char *dirBackup) {
     int archivoOrigen, archivoDestino;
     crearDirectorioBackup(dirBackup);
@@ -50,7 +58,7 @@ int copiarArchivo(InfoArchivo archivo, char *dirBackup) {
     return 0;
 }    
 
-void eliminarArchivoBackup(InfoArchivo archivo, char *dirBackup) {
+int eliminarArchivoBackup(InfoArchivo archivo, char *dirBackup) {
     char rutaDestino[512];
     char *nombreArchivo = strrchr(archivo.ruta, '/');
     if (nombreArchivo != NULL) {
@@ -65,13 +73,7 @@ void eliminarArchivoBackup(InfoArchivo archivo, char *dirBackup) {
         return -1;
     } else {
         printf("Archivo eliminado de backup: %s\n", rutaDestino);
+        return 0;
     }
-}
-
-void crearDirectorioBackup(char *dirBackup) {
-    struct stat st;
-    if (stat(dirBackup, &st) == -1) {
-        mkdir(dirBackup, 0755);
-        printf("Directorio backup creado: %s\n", dirBackup);
-    }
+    return 0;
 }

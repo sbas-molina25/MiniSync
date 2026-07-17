@@ -23,6 +23,5 @@ void procesarEntrada(char *rutaCompleta, char *nombreArchivo, ListaArchivos *lis
 void inicializarLista(ListaArchivos *lista);
 void agregarArchivo(ListaArchivos *lista, InfoArchivo archivo);
 void copiarListaArchivos(ListaArchivos *destino, ListaArchivos *origen);
-void imprimirInfoArchivo(InfoArchivo *archivo);
 
 #endif 

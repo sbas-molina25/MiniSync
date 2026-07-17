@@ -47,11 +47,10 @@ void eliminarMemoriaCompartida() {
 
 void mostrarEstadisticas(MemoriaCompartida *memoria) {
     if (memoria == NULL) return;
-    
-    printf("\n=== ESTADÍSTICAS ===\n");
-    printf("Archivos copiados: %d\n", memoria->archivosCopiados);
+    printf("\n========== ESTADÍSTICAS ===========\n");
+    printf("Archivos copiados: %ld\n", memoria->archivosCopiados);
     printf("Bytes copiados: %ld\n", memoria->bytesCopiados);
     printf("Errores: %ld\n", memoria->errores);
-    printf("Último archivo: %s\n", memoria->ultimoArchivo);
-    printf("===================\n\n");
+    printf("Último archivo copiado: %s\n", memoria->ultimoArchivo);
+    printf("=========================================\n\n");
 }

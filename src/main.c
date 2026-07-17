@@ -17,7 +17,7 @@ int ejecutando = 1;
 void manejarSenales(int senal) {
     if (senal == SIGINT || senal == SIGTERM) {
         ejecutando = 0;
-        printf("Señal recibida, terminando procesos...\n");
+        printf("Señal recibida. Terminando procesos.\n");
         fflush(stdout); // Asegurarse de que el mensaje se imprima antes de salir
     }
 }
@@ -27,34 +27,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Uso: %s <ruta_del_directorio>\n", argv[0]);
         return 1;
     }
-
-    /* // Crear daemon
-    pid_t daemon = fork();
-     if (daemon < 0) {
-        perror("Error al crear el daemon");
-        return 1;
-    }
     
-    if (daemon > 0) {
-        // Proceso padre: termina
-        printf("Daemon iniciado con PID: %d\n", daemon);
-        return 0;
-    }
-    
-    // Proceso hijo: se convierte en daemon
-    setsid();  // Nueva sesión
-    
-    // Cambiar al directorio raíz
-    if (chdir("/") < 0) {
-        perror("Error al cambiar directorio");
-        return 1;
-    }
-    
-    // Cerrar descriptores estándar
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);*/
-    
+    //Crear daemon para el logger
     // Crear memoria compartida
     MemoriaCompartida *memoria = crearMemoriaCompartida();
     if (memoria == NULL) {
@@ -90,6 +64,7 @@ int main(int argc, char *argv[]) {
         iniciarLogger();
         return 0;
     }
+    sleep(1); // Esperar un segundo para asegurarse de que el logger esté listo
 
     //Worker 1
     pid_t worker1 = fork();
@@ -122,10 +97,9 @@ int main(int argc, char *argv[]) {
     close(pipe2[0]); 
     signal(SIGINT, manejarSenales);
     signal(SIGTERM, manejarSenales);
-    printf("=== MINISYNC INICIADO ===\n");
-    printf("Monitoreando: %s\n", argv[1]);
+    printf("=========== MINISYNC INICIADO ===========\n");
     printf("Presiona Ctrl+C para detener\n");
-    printf("==========================\n\n");
+    printf("=========================================\n\n");
     iniciarMonitor(argv[1], pipe1[1], pipe2[1], memoria);
 
     //Esperar a que los procesos hijos terminen
@@ -139,6 +113,6 @@ int main(int argc, char *argv[]) {
     cerrarMemoriaCompartida(memoria);
     eliminarMemoriaCompartida();
 
-    printf("=== MINISYNC TERMINADO ===\n");
+    printf("=========== MINISYNC TERMINADO ===========\n");
     return 0;
 }
